@@ -8,7 +8,7 @@ fun main() {
         when(command) {
             "hide" -> hide()
             "show" -> show()
-            "exit" -> { println("Bye!"); return }
+            "exit" -> println("Bye!")
             else -> println("Wrong task: $command")
         }
     } while(command != "exit")
