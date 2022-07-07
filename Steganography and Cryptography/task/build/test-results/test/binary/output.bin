@@ -1,0 +1,18 @@
+[1;31m
+Start test 1[0m
+Task (hide, show, exit): 
+> 
+> hide
+Hiding message in image.
+Task (hide, show, exit): 
+> 
+> show
+Obtaining message from image.
+Task (hide, show, exit): 
+> 
+> test
+Wrong task: test
+Task (hide, show, exit): 
+> 
+> exit
+Bye!
