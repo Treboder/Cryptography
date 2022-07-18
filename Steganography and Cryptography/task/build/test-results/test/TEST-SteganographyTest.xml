@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="SteganographyTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2022-07-18T20:28:07" hostname="TREBODER" time="0.387">
+<testsuite name="SteganographyTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2022-07-18T20:35:33" hostname="TREBODER" time="0.367">
   <properties/>
-  <testcase name="start" classname="SteganographyTest" time="0.387"/>
+  <testcase name="start" classname="SteganographyTest" time="0.367"/>
   <system-out><![CDATA[?[1;31m
 Start test 1?[0m
 Task (hide, show, exit): 
