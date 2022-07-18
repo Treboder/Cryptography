@@ -10,9 +10,6 @@ files:
     }
 
   learner_created: false
-- name: test/testimage.png
-  visible: false
-  learner_created: false
 - name: test/SteganographyTest.kt
   visible: false
   text: |+
@@ -145,6 +142,15 @@ files:
     }
 
   learner_created: false
-feedback_link: https://hyperskill.org/projects/160/stages/831/implement#comment
-status: Unchecked
+- name: test/testimage.png
+  visible: false
+  learner_created: false
+- name: test/out.png
+  visible: true
+  learner_created: true
+feedback_link: https://hyperskill.org/learn/step/12267#comment
+status: Solved
+feedback:
+  message: Congratulations!
+  time: Mon, 18 Jul 2022 20:28:08 UTC
 record: -1

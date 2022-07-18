@@ -2,6 +2,10 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel target="17">
+      <module name="SteganographyAndCryptography.Steganography_and_Cryptography-task-build-classes-kotlin.main" target="11" />
+      <module name="SteganographyAndCryptography.Steganography_and_Cryptography-task-build-reports-tests.main" target="11" />
+      <module name="SteganographyAndCryptography.Steganography_and_Cryptography-task-build-test-results.main" target="11" />
+      <module name="SteganographyAndCryptography.Steganography_and_Cryptography-task-build-tmp.main" target="11" />
       <module name="SteganographyAndCryptography.Steganography_and_Cryptography-task.main" target="11" />
       <module name="SteganographyAndCryptography.util.main" target="11" />
     </bytecodeTargetLevel>
