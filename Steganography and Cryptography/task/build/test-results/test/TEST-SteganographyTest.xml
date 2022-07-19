@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="SteganographyTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2022-07-18T20:35:33" hostname="TREBODER" time="0.367">
+<testsuite name="SteganographyTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2022-07-19T16:50:45" hostname="TREBODER" time="0.334">
   <properties/>
-  <testcase name="start" classname="SteganographyTest" time="0.367"/>
+  <testcase name="start" classname="SteganographyTest" time="0.334"/>
   <system-out><![CDATA[?[1;31m
 Start test 1?[0m
 Task (hide, show, exit): 
@@ -10,9 +10,15 @@ Input image file:
 > > test/testimage.png
 Output image file: 
 > > test/out.png
-Input Image: test/testimage.png
-Output Image: test/out.png
-Image test/out.png is saved.
+Message to hide: 
+> > Hyperskill steganography program.
+Message saved in test/out.png image.
+Task (hide, show, exit): 
+> > show
+Input image file: 
+> > test/out.png
+Message:
+Hyperskill steganography program.
 Task (hide, show, exit): 
 > > exit
 Bye!
@@ -21,10 +27,13 @@ Start test 2?[0m
 Task (hide, show, exit): 
 > > hide
 Input image file: 
-> > test/notexist.png
+> > test/small.png
 Output image file: 
-> > test/out.png
-Can't read input file!
+> > test/out2.png
+Message to hide: 
+> > Hyperskill steganography program.
+The input image is not large enough to hold this message.
+Message saved in test/out2.png image.
 Task (hide, show, exit): 
 > > exit
 Bye!
