@@ -2,15 +2,11 @@ package cryptography
 
 import java.awt.Color
 import java.awt.image.BufferedImage
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
 import javax.imageio.ImageIO
 
 fun main() {
-
-
 
     do {
         print("Task (hide, show, exit): \n> ")
@@ -22,6 +18,156 @@ fun main() {
             else -> println("Wrong task: $command")
         }
     } while(command != "exit")
+
+}
+
+fun hide() {
+    print("Input image file: \n> ")
+    MessageEncoder.inputFile = readLine()!!
+
+    print("Output image file: \n> ")
+    MessageEncoder.outputFile = readLine()!!
+
+    print("Message to hide: \n> ")
+    MessageEncoder.message = readLine()!!
+
+    MessageEncoder.readInputFile()
+    MessageEncoder.hideMessage()
+    MessageEncoder.writeOutputFile()
+
+    println("Message saved in ${MessageEncoder.outputFile} image.")
+}
+
+fun show() {
+    print("Input image file: \n> ")
+    MessageDecoder.inputFile = readLine()!!
+
+    MessageDecoder.readInputFile()
+    MessageDecoder.extractMessage()
+
+    println("Message:")
+    println(MessageDecoder.message)
+}
+
+object MessageEncoder {
+
+    // vars initialized with never used default values (but needed to initialize with sth.)
+    var inputFile = ""
+    var outputFile = ""
+    var message = ""
+    var bufferedImage = BufferedImage(1,1,BufferedImage.TYPE_INT_RGB)
+
+    fun readInputFile() {
+        try {
+            bufferedImage = ImageIO.read(File(MessageEncoder.inputFile))
+        }
+        catch (e:IOException)  {
+            println("Can't read input file!")
+        }
+    }
+
+    fun hideMessage() {
+
+        var messageByteArray = message.encodeToByteArray() + byteArrayOf(0, 0, 3)
+        var messageBitSequence = convertByteArrayToBitSequence(messageByteArray)
+
+        if((bufferedImage.width * bufferedImage.height) < messageBitSequence.length) {
+            println("The input image is not large enough to hold this message.")
+            return
+        }
+
+        var index = 0
+        for(y in 0..bufferedImage.height-1)
+            for(x in 0..bufferedImage.width-1) {
+
+                var sourcePixel = Color(bufferedImage.getRGB(x,y))
+                var bitToHide = messageBitSequence[index].digitToInt()
+                var modifiedBlue = modifyBlueChannel(sourcePixel.blue, bitToHide)
+                var modifiedPixel = Color(sourcePixel.red, sourcePixel.green, modifiedBlue)
+                bufferedImage.setRGB(x,y, modifiedPixel.rgb)
+
+                index++
+                if(index == messageBitSequence.length)
+                    return
+            }
+    }
+
+    fun convertByteArrayToBitSequence(messageByteArray: ByteArray): String {
+        var messageBitSequence = ""
+        for (byte in messageByteArray) {
+            var bits = byte.toUInt().toString(radix = 2)
+            bits = bits.padStart(8,'0')
+            messageBitSequence += bits
+        }
+        return messageBitSequence
+    }
+
+    fun modifyBlueChannel(blue:Int, bitToHide:Int):Int {
+        var blueBitsBefore = Integer.toBinaryString(blue)
+        var modifiedBlue = blue.and(254).or(bitToHide) % 256 // ToDo: understand whats going on, copied from hints
+        val blueBitsAfter = Integer.toBinaryString(modifiedBlue)
+        return modifiedBlue
+    }
+
+    fun writeOutputFile() {
+        ImageIO.write(bufferedImage, "png", File(outputFile))
+    }
+}
+
+object MessageDecoder {
+
+    var inputFile = ""
+    var message = ""
+    var bufferedImage = BufferedImage(1,1,BufferedImage.TYPE_INT_RGB)
+
+    fun readInputFile() {
+        try {
+            bufferedImage = ImageIO.read(File(inputFile))
+        }
+        catch (e:IOException)  {
+            println("Can't read input file!")
+        }
+    }
+
+    fun extractMessage() {
+        var hiddenBitSequence = extractHiddenBitSequenceAsString(bufferedImage)
+        var numberOfHiddenBytes = hiddenBitSequence.length / 8
+        for(i in 0..numberOfHiddenBytes-4) {
+            // last three bytes denote the end of the message [0,0,3]
+            var hiddenByteStartIndex = i*8
+            var hiddenByteAsString = hiddenBitSequence.substring(hiddenByteStartIndex, hiddenByteStartIndex + 8)
+            var long = hiddenByteAsString.toLong()
+            var decimal = convertBinaryToDecimal(long)    // ToDo: replace with some standard functions, but dont know which
+            var char = decimal.toChar()
+            message += char
+        }
+    }
+
+    fun extractHiddenBitSequenceAsString(bufferedImage: BufferedImage):String {
+        var hiddenBitSequence = ""
+        for(y in 0..bufferedImage.height-1)
+            for(x in 0..bufferedImage.width-1){
+                hiddenBitSequence += Color(bufferedImage.getRGB(x,y)).blue % 2
+                if(hiddenBitSequence.endsWith("000000000000000000000011")) // 00000000 00000000 00000011 [0, 0, 3]
+                    return hiddenBitSequence
+            }
+        return hiddenBitSequence
+    }
+
+    fun convertBinaryToDecimal(num: Long): Int {
+        var num = num
+        var decimalNumber = 0
+        var i = 0
+        var remainder: Long
+
+        while (num.toInt() != 0) {
+            remainder = num % 10
+            num /= 10
+            decimalNumber += (remainder * Math.pow(2.0, i.toDouble())).toInt()
+            ++i
+        }
+        return decimalNumber
+    }
 
 }
 
@@ -37,158 +183,5 @@ fun test() {
     println("11111".encodeToByteArray().joinToString { " " })
     println("11111".toByteArray().joinToString { " " })
 
-
     println("a".toInt(2))
-}
-
-fun convertBinaryToDecimal(num: Long): Int {
-    var num = num
-    var decimalNumber = 0
-    var i = 0
-    var remainder: Long
-
-    while (num.toInt() != 0) {
-        remainder = num % 10
-        num /= 10
-        decimalNumber += (remainder * Math.pow(2.0, i.toDouble())).toInt()
-        ++i
-    }
-    return decimalNumber
-}
-
-fun hide() {
-
-    print("Input image file: \n> ")
-    var inputFile = readLine()!!
-
-    print("Output image file: \n> ")
-    var outputFile = readLine()!!
-
-    print("Message to hide: \n> ")
-    var message = readLine()!!
-
-    try {
-        // create outputstream from input image (read image)
-        val bufferedInputImage = ImageIO.read(File(inputFile))
-        val bos = ByteArrayOutputStream()
-        ImageIO.write(bufferedInputImage, "png", bos)
-
-        // create inputstream for output image
-        val data = bos.toByteArray()
-        val bis = ByteArrayInputStream(data)
-        val bufferedOutputImage = ImageIO.read(bis)
-
-        // perform pixel operations in order to hide the message
-        //performPixelOperations(bufferedInputImage, bufferedOutputImage)
-        setMessage(bufferedOutputImage, message)
-
-        // write image from output image
-        ImageIO.write(bufferedOutputImage, "png", File(outputFile))
-        println("Message saved in $outputFile image.")
-    }
-    catch (e:IOException)  {
-        println("Can't read input file!")
-    }
-
-}
-
-fun setMessage(bufferedImage: BufferedImage, message: String) {
-
-    var messageByteArray = message.encodeToByteArray() + byteArrayOf(0, 0, 3)
-
-    var messageBitSequence = ""
-    for (byte in messageByteArray)
-    {
-        var bits = byte.toUInt().toString(radix = 2)
-        bits = bits.padStart(8,'0')
-        messageBitSequence += bits
-    }
-
-    if((bufferedImage.width * bufferedImage.height) < messageBitSequence.length) {
-        println("The input image is not large enough to hold this message.")
-        return
-    }
-
-    var index = 0
-    for(y in 0..bufferedImage.height-1)
-        for(x in 0..bufferedImage.width-1) {
-            var sourcePixel = Color(bufferedImage.getRGB(x,y))
-            var bitToHide = messageBitSequence[index].digitToInt()
-
-            var modifiedBlueChannel = sourcePixel.blue
-
-            var blueBitsBefore = modifiedBlueChannel.toUInt().toString(radix = 2)
-            var blueBitsBefore2 = Integer.toBinaryString(modifiedBlueChannel)
-            var blueBitsBefore3 = modifiedBlueChannel.toDouble().toBits()
-
-            val lastBitBefore = sourcePixel.blue % 2
-            if(lastBitBefore != bitToHide) {
-                modifiedBlueChannel +=1
-                if(modifiedBlueChannel == 256)
-                    modifiedBlueChannel = 254
-            }
-            val blueBitsAfter = modifiedBlueChannel.toUInt().toString(radix = 2)
-
-            var modifiedPixel = Color(sourcePixel.red, sourcePixel.green, modifiedBlueChannel)
-            bufferedImage.setRGB(x,y, modifiedPixel.rgb)
-
-            bufferedImage.setRGB(x, y, Color(sourcePixel.red, sourcePixel.green, sourcePixel.blue.and(254).or(bitToHide) % 256).rgb)
-
-            index++
-            if(messageBitSequence.length == index)
-                return
-        }
-}
-
-fun getMessage(bufferedImage: BufferedImage):String {
-
-    var message = ""
-    var hiddenBitSequence = getHiddenBitSequence(bufferedImage)
-    var byteCount = hiddenBitSequence.length / 8
-    for(i in 0..byteCount-4)
-    {
-        var start = i*8
-        var end = i*8+8
-        var string = hiddenBitSequence.substring(start, end)
-
-        // transform bit sequence to corresponding character
-        var long = string.toLong()
-        var decimal = convertBinaryToDecimal(long)
-        var char1 = decimal.toChar()
-        var char2 = string.toInt().toChar()
-
-        message += char1
-    }
-
-    return message
-}
-
-fun getHiddenBitSequence(bufferedImage: BufferedImage):String {
-    var hiddenBitSequence = ""
-    for(y in 0..bufferedImage.height-1)
-        for(x in 0..bufferedImage.width-1){
-            hiddenBitSequence += Color(bufferedImage.getRGB(x,y)).blue % 2
-            if(hiddenBitSequence.endsWith("000000000000000000000011")) // 00000000 00000000 00000011 [0, 0, 3]
-                return hiddenBitSequence
-        }
-    return hiddenBitSequence
-}
-
-
-fun show() {
-    print("Input image file: \n> ")
-    var inputFile = readLine()!!
-
-    try {
-        // create outputstream from input image (read image)
-        val bufferedInputImage = ImageIO.read(File(inputFile))
-        var message = getMessage(bufferedInputImage)
-        println("Message:")
-        println(message)
-
-    }
-    catch (e:IOException)  {
-        println("Can't read input file!")
-    }
-
 }
