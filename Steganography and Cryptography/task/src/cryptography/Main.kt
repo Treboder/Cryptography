@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException
 import javax.imageio.ImageIO
+import kotlin.experimental.xor
 
 fun main() {
 
@@ -33,6 +34,9 @@ fun hide() {
     print("Message to hide: \n> ")
     MessageEncoder.message = readLine()!!
 
+    print("Password: \n> ")
+    MessageEncoder.password = readLine()!!
+
     MessageEncoder.readInputFile()
     MessageEncoder.hideMessage()
     MessageEncoder.writeOutputFile()
@@ -44,6 +48,9 @@ fun hide() {
 fun show() {
     print("Input image file: \n> ")
     MessageDecoder.inputFile = readLine()!!
+
+    print("Password: \n> ")
+    MessageDecoder.password = readLine()!!
 
     MessageDecoder.readInputFile()
     MessageDecoder.extractMessage()
@@ -60,6 +67,7 @@ object MessageEncoder {
     var inputFile = ""
     var outputFile = ""
     var message = ""
+    var password = ""
     var bufferedImage = BufferedImage(1,1,BufferedImage.TYPE_INT_RGB)
 
     fun readInputFile() {
@@ -73,8 +81,9 @@ object MessageEncoder {
 
     fun hideMessage() {
 
-        var messageByteArray = message.encodeToByteArray() + byteArrayOf(0, 0, 3)
-        var messageBitString = convertByteArrayToBitString(messageByteArray)
+        var plainMessageByteArray = message.encodeToByteArray() + byteArrayOf(0, 0, 3)
+        var encryptedmessageByteArray = encryptMessage(plainMessageByteArray)
+        var messageBitString = convertByteArrayToBitString(encryptedmessageByteArray)
 
         if((bufferedImage.width * bufferedImage.height) < messageBitString.length) {
             println("The input image is not large enough to hold this message.")
@@ -95,6 +104,22 @@ object MessageEncoder {
                 if(++currentMessageBitIndex == messageBitString.length)
                     return
             }
+    }
+
+    fun encryptMessage(messageByteArray:ByteArray): ByteArray {
+        var passwordByteArray = password.toByteArray()
+        var encryptedMessageByteArray = ByteArray(messageByteArray.size)
+        for(i in 0..messageByteArray.size-4) { // last three 003
+            var messageByte = messageByteArray[i]
+            var passwordByteIndex = i % passwordByteArray.size
+            var passwordByte = passwordByteArray[passwordByteIndex]
+            var encryptedByte = messageByte.xor(passwordByte)
+            encryptedMessageByteArray[i] = encryptedByte
+        }
+        encryptedMessageByteArray[encryptedMessageByteArray.size-3] = 0
+        encryptedMessageByteArray[encryptedMessageByteArray.size-2] = 0
+        encryptedMessageByteArray[encryptedMessageByteArray.size-1] = 3
+        return encryptedMessageByteArray
     }
 
     fun convertByteArrayToBitString(messageByteArray: ByteArray): String {
@@ -128,6 +153,7 @@ object MessageDecoder {
     // vars initialized with never used default values (but needed to initialize with sth.)
     var inputFile = ""
     var message = ""
+    var password = ""
     var bufferedImage = BufferedImage(1,1,BufferedImage.TYPE_INT_RGB)
 
     fun readInputFile() {
@@ -140,17 +166,42 @@ object MessageDecoder {
     }
 
     fun extractMessage() {
-        var hiddenBitSequence = extractHiddenBitSequenceAsString(bufferedImage)
-        var numberOfHiddenBytes = hiddenBitSequence.length / 8
-        for(i in 0..numberOfHiddenBytes-4) {
-            // last three bytes denote the end of the message [0,0,3]
-            var hiddenByteStartIndex = i*8
-            var hiddenByteAsBitString = hiddenBitSequence.substring(hiddenByteStartIndex, hiddenByteStartIndex + 8)
-            var long = hiddenByteAsBitString.toLong()
-            var decimal = convertBinaryToDecimal(long)    // ToDo: replace with some standard functions, but dont know which
-            var char = decimal.toChar()
+        var hiddenBitString = extractHiddenBitSequenceAsString(bufferedImage)
+        var hiddenByteArray = convertBitStringToByteArray(hiddenBitString)
+        var decyrptedMessage = decryptMessage(hiddenByteArray)
+
+        for(byte in decyrptedMessage) {
+            var char = byte.toChar()
             message += char
         }
+
+    }
+
+    fun convertBitStringToByteArray(bitString: String):ByteArray {
+        var numberOfBytes = bitString.length / 8
+        var byteArray = ByteArray(numberOfBytes)
+        for(i in 0..numberOfBytes-4) {
+            var hiddenByteStartIndex = i*8
+            var hiddenByteAsBitString = bitString.substring(hiddenByteStartIndex, hiddenByteStartIndex + 8)
+            var long = hiddenByteAsBitString.toLong()
+            var decimal = convertBinaryToDecimal(long)    // ToDo: replace with some standard functions, but dont know which
+            byteArray[i] = decimal.toByte()
+        }
+        return byteArray
+    }
+
+    fun decryptMessage(messageByteArray:ByteArray): ByteArray {
+        var passwordByteArray = password.toByteArray()
+        var decryptedMessageByteArray = ByteArray(messageByteArray.size-3)
+        for(i in 0..messageByteArray.size-4) { // last three 003
+            var messageByte = messageByteArray[i]
+            var passwordByteIndex = i % passwordByteArray.size
+            var passwordByte = passwordByteArray[passwordByteIndex]
+            var encryptedByte = messageByte.xor(passwordByte)
+            decryptedMessageByteArray[i] = encryptedByte
+        }
+
+        return decryptedMessageByteArray
     }
 
     fun extractHiddenBitSequenceAsString(bufferedImage: BufferedImage):String {

@@ -207,15 +207,12 @@ files:
 - name: test/testimage.png
   visible: false
   learner_created: false
+- name: test/out2.png
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/12269#comment
-status: Failed
+status: Solved
 feedback:
-  message: "Wrong answer in test #1\n\nWrong output after inserting the message.\n\
-    \nPlease find below the output of your program during this failed test.\nNote\
-    \ that the &#39;&gt;&#39; character indicates the beginning of the input line.\n\
-    \n---\n\nTask (hide, show, exit): \n&gt; &gt; hide\nInput image file: \n&gt; &gt;\
-    \ test/testimage.png\nOutput image file: \n&gt; &gt; test/out.png\nMessage to\
-    \ hide: \n&gt; &gt; Hyperskill steganography program.\nMessage saved in test/out.png\
-    \ image.\nTask (hide, show, exit): \n&gt;"
-  time: Wed, 20 Jul 2022 07:00:24 UTC
+  message: Congratulations!
+  time: Wed, 20 Jul 2022 09:03:34 UTC
 record: -1
