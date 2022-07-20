@@ -193,8 +193,11 @@ files:
   visible: true
   learner_created: true
 feedback_link: https://hyperskill.org/learn/step/12268#comment
-status: Solved
+status: Failed
 feedback:
-  message: Congratulations!
-  time: Tue, 19 Jul 2022 21:08:59 UTC
+  message: "Wrong answer in test #1\n\nread(inputFile) must not be null\n\nPlease\
+    \ find below the output of your program during this failed test.\nNote that the\
+    \ &#39;&gt;&#39; character indicates the beginning of the input line.\n\n---\n\
+    \nTask (hide, show, exit): \n&gt; &gt; hide\nInput image file: \n&gt;"
+  time: Wed, 20 Jul 2022 07:50:12 UTC
 record: -1

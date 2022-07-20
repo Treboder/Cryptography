@@ -8,6 +8,8 @@ import javax.imageio.ImageIO
 
 fun main() {
 
+    test()
+
     do {
         print("Task (hide, show, exit): \n> ")
         val command = readln()
@@ -34,6 +36,7 @@ fun hide() {
     MessageEncoder.readInputFile()
     MessageEncoder.hideMessage()
     MessageEncoder.writeOutputFile()
+    MessageEncoder.clearMessage()
 
     println("Message saved in ${MessageEncoder.outputFile} image.")
 }
@@ -47,6 +50,8 @@ fun show() {
 
     println("Message:")
     println(MessageDecoder.message)
+
+    MessageDecoder.clearMessage()
 }
 
 object MessageEncoder {
@@ -69,30 +74,30 @@ object MessageEncoder {
     fun hideMessage() {
 
         var messageByteArray = message.encodeToByteArray() + byteArrayOf(0, 0, 3)
-        var messageBitSequence = convertByteArrayToBitSequence(messageByteArray)
+        var messageBitString = convertByteArrayToBitString(messageByteArray)
 
-        if((bufferedImage.width * bufferedImage.height) < messageBitSequence.length) {
+        if((bufferedImage.width * bufferedImage.height) < messageBitString.length) {
             println("The input image is not large enough to hold this message.")
             return
         }
 
-        var index = 0
+        var currentMessageBitIndex = 0
         for(y in 0..bufferedImage.height-1)
             for(x in 0..bufferedImage.width-1) {
 
-                var sourcePixel = Color(bufferedImage.getRGB(x,y))
-                var bitToHide = messageBitSequence[index].digitToInt()
-                var modifiedBlue = modifyBlueChannel(sourcePixel.blue, bitToHide)
-                var modifiedPixel = Color(sourcePixel.red, sourcePixel.green, modifiedBlue)
+                var originalPixel = Color(bufferedImage.getRGB(x,y))
+                var bitToHide = messageBitString[currentMessageBitIndex].digitToInt()
+                var modifiedBlue = modifyBlueChannel(originalPixel.blue, bitToHide)
+                var modifiedPixel = Color(originalPixel.red, originalPixel.green, modifiedBlue)
                 bufferedImage.setRGB(x,y, modifiedPixel.rgb)
 
-                index++
-                if(index == messageBitSequence.length)
+                // return if all message bits have been hidden
+                if(++currentMessageBitIndex == messageBitString.length)
                     return
             }
     }
 
-    fun convertByteArrayToBitSequence(messageByteArray: ByteArray): String {
+    fun convertByteArrayToBitString(messageByteArray: ByteArray): String {
         var messageBitSequence = ""
         for (byte in messageByteArray) {
             var bits = byte.toUInt().toString(radix = 2)
@@ -112,10 +117,15 @@ object MessageEncoder {
     fun writeOutputFile() {
         ImageIO.write(bufferedImage, "png", File(outputFile))
     }
+
+    fun clearMessage() {
+        message = ""
+    }
 }
 
 object MessageDecoder {
 
+    // vars initialized with never used default values (but needed to initialize with sth.)
     var inputFile = ""
     var message = ""
     var bufferedImage = BufferedImage(1,1,BufferedImage.TYPE_INT_RGB)
@@ -135,8 +145,8 @@ object MessageDecoder {
         for(i in 0..numberOfHiddenBytes-4) {
             // last three bytes denote the end of the message [0,0,3]
             var hiddenByteStartIndex = i*8
-            var hiddenByteAsString = hiddenBitSequence.substring(hiddenByteStartIndex, hiddenByteStartIndex + 8)
-            var long = hiddenByteAsString.toLong()
+            var hiddenByteAsBitString = hiddenBitSequence.substring(hiddenByteStartIndex, hiddenByteStartIndex + 8)
+            var long = hiddenByteAsBitString.toLong()
             var decimal = convertBinaryToDecimal(long)    // ToDo: replace with some standard functions, but dont know which
             var char = decimal.toChar()
             message += char
@@ -169,19 +179,32 @@ object MessageDecoder {
         return decimalNumber
     }
 
+    fun clearMessage() {
+        message = ""
+    }
 }
 
 fun test() {
-    var messageString = "qwfwqfq"
-    var messageBytes = messageString.toByteArray(Charsets.UTF_8)
-    var messageBits = ""
 
-    println("11001".toInt(2))
-    println("11001".toLong(2))
-    println("110010000".toInt(2).toChar())
-    println("110010000".toLong(2).toChar())
-    println("11111".encodeToByteArray().joinToString { " " })
-    println("11111".toByteArray().joinToString { " " })
+    var v1 = MessageEncoder.modifyBlueChannel(253, 0)
+    var v2 = MessageEncoder.modifyBlueChannel(254, 0)
+    var v3 = MessageEncoder.modifyBlueChannel(255, 0)
 
-    println("a".toInt(2))
+    var v4 = MessageEncoder.modifyBlueChannel(253, 1)
+    var v5 = MessageEncoder.modifyBlueChannel(254, 1)
+    var v6 = MessageEncoder.modifyBlueChannel(255, 1)
+
+    var v7 = 253.and(254)
+    var v8 = 254.and(254)
+    var v9 = 255.and(254)
+
+    var v10 = 252.or(0)
+    var v11 = 252.or(1)
+    var v12 = 254.or(0)
+    var v13 = 254.or(1)
+
+    var v14 = 253 % 256
+    var v15 = 254 % 256
+    var v16 = 255 % 256
+
 }
