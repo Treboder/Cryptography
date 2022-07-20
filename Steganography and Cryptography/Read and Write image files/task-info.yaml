@@ -142,12 +142,12 @@ files:
     }
 
   learner_created: false
-- name: test/testimage.png
-  visible: false
-  learner_created: false
 - name: test/out.png
   visible: true
   learner_created: true
+- name: test/testimage.png
+  visible: false
+  learner_created: false
 feedback_link: https://hyperskill.org/learn/step/12267#comment
 status: Solved
 feedback:
