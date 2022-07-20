@@ -201,12 +201,12 @@ files:
     }
 
   learner_created: false
-- name: test/out.png
-  visible: true
-  learner_created: true
 - name: test/testimage.png
   visible: false
   learner_created: false
+- name: test/out.png
+  visible: true
+  learner_created: true
 - name: test/out2.png
   visible: true
   learner_created: true
@@ -214,5 +214,5 @@ feedback_link: https://hyperskill.org/learn/step/12269#comment
 status: Solved
 feedback:
   message: Congratulations!
-  time: Wed, 20 Jul 2022 13:12:46 UTC
-record: -1
+  time: Wed, 20 Jul 2022 19:10:58 UTC
+record: 4

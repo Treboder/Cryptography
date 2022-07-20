@@ -182,16 +182,16 @@ files:
 - name: test/testimage.png
   visible: false
   learner_created: false
-- name: test/small.png
-  visible: false
-  text: iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAIAAAACUFjqAAAACXBIWXMAAC4jAAAuIwF4pT92AAABBUlEQVQYlQXB60rDMBQA4JyT0/Sy1NW2g4GCKAo+w17EF/eXIP4QndvcxbVplqY58ftgtXoJLGa6nl8tqmaZULL7+RhsP9ptmmpCFBIlARcJ83Dwkgi4SElFtTlsKMUAiI1OysQqBQC+Y5fJ0QgO3hARKcKHm3qWeDv6UuvOCPbuzCFJNRnbi6L0ztw/Ldpabfe4/T1+7fxwsSKOpLJqChNRNEM8n11/gb3Je65cMFEoattHRbhoyn0nJaIEfr5Tb98lqeZ4WlMu4bZOXz/jci4iCEIYLqAzkICFvKaMpvddIIkxwKaPOhW9i72NueSJI61PLkpZ5eJvEIND4Ni56KbQWQbmf89/i6y31LGHAAAAAElFTkSuQmCC
-  learner_created: false
 - name: test/out.png
   visible: true
   learner_created: true
 - name: test/out2.png
   visible: true
   learner_created: true
+- name: test/small.png
+  visible: false
+  text: iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAIAAAACUFjqAAAACXBIWXMAAC4jAAAuIwF4pT92AAABBUlEQVQYlQXB60rDMBQA4JyT0/Sy1NW2g4GCKAo+w17EF/eXIP4QndvcxbVplqY58ftgtXoJLGa6nl8tqmaZULL7+RhsP9ptmmpCFBIlARcJ83Dwkgi4SElFtTlsKMUAiI1OysQqBQC+Y5fJ0QgO3hARKcKHm3qWeDv6UuvOCPbuzCFJNRnbi6L0ztw/Ldpabfe4/T1+7fxwsSKOpLJqChNRNEM8n11/gb3Je65cMFEoattHRbhoyn0nJaIEfr5Tb98lqeZ4WlMu4bZOXz/jci4iCEIYLqAzkICFvKaMpvddIIkxwKaPOhW9i72NueSJI61PLkpZ5eJvEIND4Ni56KbQWQbmf89/i6y31LGHAAAAAElFTkSuQmCC
+  learner_created: false
 feedback_link: https://hyperskill.org/learn/step/12268#comment
 status: Failed
 feedback:
@@ -199,5 +199,5 @@ feedback:
     \ find below the output of your program during this failed test.\nNote that the\
     \ &#39;&gt;&#39; character indicates the beginning of the input line.\n\n---\n\
     \nTask (hide, show, exit): \n&gt; &gt; hide\nInput image file: \n&gt;"
-  time: Wed, 20 Jul 2022 07:56:32 UTC
-record: -1
+  time: Wed, 20 Jul 2022 13:55:01 UTC
+record: 1
