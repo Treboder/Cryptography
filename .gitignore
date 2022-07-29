@@ -1,1 +1,18 @@
+# Project exclude paths
+/.idea
+/gradle/
+/Steganography and Cryptography/Encrypt the message
+/Steganography and Cryptography/Hide a message in an image
+/Steganography and Cryptography/Program interface
+/Steganography and Cryptography/Read and Write image files
+/Steganography and Cryptography/task/build
+/Steganography and Cryptography/task/out
+/Steganography and Cryptography/task/test
+/Steganography and Cryptography/lesson-info.yaml
+/.gitignore
+/build.gradle
+/course-info.yaml
+/course-remote-info.yaml
+/gradlew
+/gradlew.bat
 /settings.gradle
