@@ -46,15 +46,8 @@ class SteganographyTest: StageTest<Any>() {
 
             val message = "Hyperskill steganography program."
             outputString = main.execute(message).toLowerCase().trim()
-            if (!outputString.contains("password:")) {
+            if (!( outputString.contains("message saved") && outputString.contains("task (hide, show, exit):") ) ) {
                 return CheckResult(false, "Wrong output after inserting the message.")
-            }
-
-            val password = "mypassword"
-            outputString = main.execute("mypassword").toLowerCase().trim()
-            if ( ( !outputString.contains("message saved")
-                && outputString.contains("task (hide, show, exit):") ) ) {
-                return CheckResult(false, "Wrong output after inserting the password.")
             }
 
             val outputFile = File(outfile)
@@ -62,21 +55,16 @@ class SteganographyTest: StageTest<Any>() {
                 return CheckResult(false, "Image file $outfile hasn't been created.")
             }
             val outputImage: BufferedImage = ImageIO.read(outputFile)
-            if (imageHash(outputImage) != "cbe82b64ab5f3641afc22e8c9b688902506b3444") {
+            if (imageHash(outputImage) != "c1efea2b60e889c86d38110d68589ac16610a4b1") {
                 return CheckResult(false, "Wrong output file. Wrong output image hash.")
             }
 
             outputString = main.execute("show").toLowerCase().trim()
             if (!outputString.contains("input image file:")) {
-                return CheckResult(false, "Wrong output after the \"show\" command.")
+                return CheckResult(false, "Wrong output after the \"hide\" command.")
             }
 
             outputString = main.execute(outfile).toLowerCase().trim()
-            if (!outputString.contains("password:")) {
-                return CheckResult(false, "Wrong output after inserting the message.")
-            }
-
-            outputString = main.execute(password).toLowerCase().trim()
             if (!( outputString.contains("message:") && outputString.contains(message.toLowerCase()) &&
                         outputString.contains("task (hide, show, exit):") ) ) {
                 return CheckResult(false, "Wrong output after inserting the input filename.")
@@ -134,12 +122,6 @@ class SteganographyTest: StageTest<Any>() {
 
             val message = "Hyperskill steganography program."
             outputString = main.execute(message).toLowerCase().trim()
-            if (!outputString.contains("password:")) {
-                return CheckResult(false, "Wrong output after inserting the message.")
-            }
-
-            val password = "mypassword"
-            outputString = main.execute(password).toLowerCase().trim()
             if ( !( outputString.contains("the input image is not large enough to hold this message") && outputString.contains("task (hide, show, exit):") ) ) {
                 return CheckResult(false, "The program should check that the image size is adequate for holding the Bytes array.")
             }

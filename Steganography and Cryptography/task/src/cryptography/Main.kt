@@ -9,6 +9,8 @@ import kotlin.experimental.xor
 
 fun main() {
 
+    test()
+
     do {
         print("Task (hide, show, exit): \n> ")
         val command = readln()
@@ -79,27 +81,27 @@ object MessageEncoder {
 
     fun hideMessage() {
 
-        var plainMessageByteArray = message.encodeToByteArray()
-        var encryptedMessageByteArray = encryptMessage(plainMessageByteArray) + byteArrayOf(0, 0, 3)
-        var encryptedMessageBitString = convertByteArrayToBitString(encryptedMessageByteArray)
+        var plainMessageByteArray = message.encodeToByteArray() + byteArrayOf(0, 0, 3)
+        var encryptedmessageByteArray = encryptMessage(plainMessageByteArray)
+        var messageBitString = convertByteArrayToBitString(encryptedmessageByteArray)
 
-        if((bufferedImage.width * bufferedImage.height) < encryptedMessageBitString.length) {
+        if((bufferedImage.width * bufferedImage.height) < messageBitString.length) {
             println("The input image is not large enough to hold this message.")
             return
         }
 
-        // raster the image pixel by pixel and hide the message using the least significant bits in the blue channel
         var currentMessageBitIndex = 0
         for(y in 0..bufferedImage.height-1)
             for(x in 0..bufferedImage.width-1) {
+
                 var originalPixel = Color(bufferedImage.getRGB(x,y))
-                var bitToHide = encryptedMessageBitString[currentMessageBitIndex].digitToInt()
+                var bitToHide = messageBitString[currentMessageBitIndex].digitToInt()
                 var modifiedBlue = modifyBlueChannel(originalPixel.blue, bitToHide)
                 var modifiedPixel = Color(originalPixel.red, originalPixel.green, modifiedBlue)
-                bufferedImage.setRGB(x, y, modifiedPixel.rgb)
+                bufferedImage.setRGB(x,y, modifiedPixel.rgb)
 
                 // return if all message bits have been hidden
-                if(++currentMessageBitIndex == encryptedMessageBitString.length)
+                if(++currentMessageBitIndex == messageBitString.length)
                     return
             }
     }
@@ -107,13 +109,16 @@ object MessageEncoder {
     fun encryptMessage(messageByteArray:ByteArray): ByteArray {
         var passwordByteArray = password.toByteArray()
         var encryptedMessageByteArray = ByteArray(messageByteArray.size)
-        for(i in 0..messageByteArray.size-1) {
+        for(i in 0..messageByteArray.size-4) { // last three 003
             var messageByte = messageByteArray[i]
             var passwordByteIndex = i % passwordByteArray.size
             var passwordByte = passwordByteArray[passwordByteIndex]
             var encryptedByte = messageByte.xor(passwordByte)
             encryptedMessageByteArray[i] = encryptedByte
         }
+        encryptedMessageByteArray[encryptedMessageByteArray.size-3] = 0
+        encryptedMessageByteArray[encryptedMessageByteArray.size-2] = 0
+        encryptedMessageByteArray[encryptedMessageByteArray.size-1] = 3
         return encryptedMessageByteArray
     }
 
@@ -161,27 +166,21 @@ object MessageDecoder {
     }
 
     fun extractMessage() {
-        var encryptedMessageBitString = extractHiddenBitSequenceAsString(bufferedImage)
-        var encryptedMessageByteArray = convertBitStringToByteArray(encryptedMessageBitString)
-        var plainMessageByteArray = decryptMessage(encryptedMessageByteArray)
-        message = plainMessageByteArray.toString(Charsets.UTF_8)
-    }
+        var hiddenBitString = extractHiddenBitSequenceAsString(bufferedImage)
+        var hiddenByteArray = convertBitStringToByteArray(hiddenBitString)
+        var decyrptedMessage = decryptMessage(hiddenByteArray)
 
-    fun extractHiddenBitSequenceAsString(bufferedImage: BufferedImage):String {
-        var hiddenBitSequence = ""
-        for(y in 0..bufferedImage.height-1)
-            for(x in 0..bufferedImage.width-1){
-                hiddenBitSequence += Color(bufferedImage.getRGB(x,y)).blue % 2
-                if(hiddenBitSequence.endsWith("000000000000000000000011")) // end sequence [0, 0, 3]
-                    return hiddenBitSequence.substringBeforeLast("000000000000000000000011")
-            }
-        return hiddenBitSequence // in this case the end sequence [0, 0, 3] is missing in the picture
+        for(byte in decyrptedMessage) {
+            var char = byte.toChar()
+            message += char
+        }
+
     }
 
     fun convertBitStringToByteArray(bitString: String):ByteArray {
         var numberOfBytes = bitString.length / 8
         var byteArray = ByteArray(numberOfBytes)
-        for(i in 0..numberOfBytes-1) {
+        for(i in 0..numberOfBytes-4) {
             var hiddenByteStartIndex = i*8
             var hiddenByteAsBitString = bitString.substring(hiddenByteStartIndex, hiddenByteStartIndex + 8)
             var long = hiddenByteAsBitString.toLong()
@@ -193,8 +192,8 @@ object MessageDecoder {
 
     fun decryptMessage(messageByteArray:ByteArray): ByteArray {
         var passwordByteArray = password.toByteArray()
-        var decryptedMessageByteArray = ByteArray(messageByteArray.size)
-        for(i in 0..messageByteArray.size-1) {
+        var decryptedMessageByteArray = ByteArray(messageByteArray.size-3)
+        for(i in 0..messageByteArray.size-4) { // last three 003
             var messageByte = messageByteArray[i]
             var passwordByteIndex = i % passwordByteArray.size
             var passwordByte = passwordByteArray[passwordByteIndex]
@@ -205,7 +204,16 @@ object MessageDecoder {
         return decryptedMessageByteArray
     }
 
-
+    fun extractHiddenBitSequenceAsString(bufferedImage: BufferedImage):String {
+        var hiddenBitSequence = ""
+        for(y in 0..bufferedImage.height-1)
+            for(x in 0..bufferedImage.width-1){
+                hiddenBitSequence += Color(bufferedImage.getRGB(x,y)).blue % 2
+                if(hiddenBitSequence.endsWith("000000000000000000000011")) // 00000000 00000000 00000011 [0, 0, 3]
+                    return hiddenBitSequence
+            }
+        return hiddenBitSequence
+    }
 
     fun convertBinaryToDecimal(num: Long): Int {
         var num = num
@@ -227,7 +235,7 @@ object MessageDecoder {
     }
 }
 
-fun tryingToUnderstandModifyBlueChannelFunction() {
+fun test() {
 
     var v1 = MessageEncoder.modifyBlueChannel(253, 0)
     var v2 = MessageEncoder.modifyBlueChannel(254, 0)
